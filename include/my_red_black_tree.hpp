@@ -82,7 +82,7 @@ private:
             return;
         __node *gparent = parent->__parent;
         if (gparent->__right == nullptr ||
-            gparent->__right->__left == nullptr && gparent->__right->__right == nullptr) {
+            (gparent->__right->__left == nullptr && gparent->__right->__right == nullptr)) {
             __node *uncle = gparent->__right;
             if (uncle != nullptr && uncle->__color == 'r') {
                 parent->__color = 'b';
@@ -99,7 +99,7 @@ private:
                 }
             }
         } else if (gparent->__left == nullptr ||
-                   gparent->__left->__left == nullptr && gparent->__left->__right == nullptr) {
+                   (gparent->__left->__left == nullptr && gparent->__left->__right == nullptr)) {
             __node *uncle = gparent->__left;
             if (uncle != nullptr && uncle->__color == 'r') {
                 parent->__color = 'b';
@@ -132,7 +132,7 @@ public:
     }
 
     void insert(const T &value) noexcept {
-        __node *node = new __node{nullptr, nullptr, nullptr, value};
+        __node *node = new __node{nullptr, nullptr, nullptr, value, 'r'};
         __insert(value, __root, node);
     }
 
