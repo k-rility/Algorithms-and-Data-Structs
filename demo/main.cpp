@@ -3,13 +3,14 @@
 
 int main() {
     my_red_black_tree<int> rbt;
-    rbt.insert(20);
-    rbt.insert(15);
-    rbt.insert(35);
-    rbt.insert(40);
     rbt.insert(30);
-    rbt.insert(45);
+    rbt.insert(40);
+    rbt.insert(25);
     rbt.insert(50);
-    rbt.insert(60);
+    rbt.insert(35);
+    rbt.insert(37);
+    rbt.insert(32);
+    rbt.remove(50);
+//    std::cout << rbt.bh() << std::endl;
     return 0;
 }

@@ -4,7 +4,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(BUILD_TESTS "Build tests" ON)
-option(BUILD_DOCS "Build documentation" OFF)
 option(BUILD_COVERAGE "Build code coverage" OFF)
 
 set(
@@ -30,7 +29,7 @@ hunter_add_package(GTest)
 find_package(GTest CONFIG REQUIRED)
 
 add_library(${PROJECT_NAME} STATIC
-#         enum your files and delete this comment
+        #         enum your files and delete this comment
         ${CMAKE_CURRENT_SOURCE_DIR}/sources/my_stack.cpp
         )
 
@@ -47,9 +46,10 @@ target_link_libraries(demo ${PROJECT_NAME})
 
 if (BUILD_TESTS)
     add_executable(tests
-#             TODO: enum your files and delete this comment
+            #             TODO: enum your files and delete this comment
             ${CMAKE_CURRENT_SOURCE_DIR}
             tests/my_stack_test.cpp
+            tests/red_black_tree_test.cpp
             )
 
     target_link_libraries(tests ${PROJECT_NAME} GTest::gtest_main)
