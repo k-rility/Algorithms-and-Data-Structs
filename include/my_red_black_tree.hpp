@@ -102,6 +102,7 @@ private:
             pivot->__right->__parent = node;
         }
         pivot->__parent = node->__parent;
+        __node *temp = node;
         if (node->__parent == nullptr) {
             __root = pivot;
         } else if (node == node->__parent->__left) {
@@ -109,8 +110,8 @@ private:
         } else if (node == node->__parent->__right) {
             node->__parent->__right = pivot;
         }
-        pivot->__right = node;
-        node->__parent = pivot;
+        pivot->__right = temp;
+        temp->__parent = pivot;
     }
 
     void __left_rotate(__node *&node) noexcept {
@@ -120,23 +121,103 @@ private:
             pivot->__left->__parent = node;
         }
         pivot->__parent = node->__parent;
+        __node *temp = node;
         if (node->__parent == nullptr) {
             __root = pivot;
+            //TODO тут можно сделать по другому без else if, аналогично и с правым вращением
         } else if (node == node->__parent->__left) {
+            //node=pivot
             node->__parent->__left = pivot;
         } else if (node == node->__parent->__right) {
+            //node=pivot
             node->__parent->__right = pivot;
         }
-        pivot->__left = node;
-        node->__parent = pivot;
+        pivot->__left = temp;
+        temp->__parent = pivot;
     }
 
     void __remove_fix_up(__node *&node) noexcept {
-
+        if (node->__color == red) {
+            if (!(node->__right)) {
+                if (!(node->__left->__left) && !(node->__left->__right)) {
+                    node->__color = black;
+                    node->__left->__color = red;
+                } else if (node->__left->__left) {
+                    node->__color = black;
+                    node->__left->__color = red;
+                    node->__left->__left->__color = black;
+                    __right_rotate(node);
+                } else {
+                    node->__left->__color = red;
+                    node->__left->__right->__color = black;
+                    __left_rotate(node->__left);
+                    __remove_fix_up(node);
+                }
+            } else {
+                if (!(node->__right->__left) && !(node->__right->__right)) {
+                    node->__color = black;
+                    node->__right->__color = red;
+                } else if (node->__right->__right) {
+                    node->__color = black;
+                    node->__right->__color = red;
+                    node->__right->__right->__color = black;
+                    __left_rotate(node);
+                } else {
+                    node->__right->__color = red;
+                    node->__right->__left->__color = black;
+                    __right_rotate(node->__right);
+                    __remove_fix_up(node);
+                }
+            }
+        }
     }
 
-    // TODO доделать случай с удалением черной вершины без детей
+    void __remove(const T &value, __node *&node) noexcept {
+        if (!node)
+            return;
+        else if (value > node->__data)
+            __remove(value, node->__right);
+        else if (value < node->__data)
+            __remove(value, node->__left);
+        else {
+            if (node->__color == red) {
+                if (!(node->__left) && !(node->__right)) {
+                    delete node;
+                    node = nullptr;
+                } else {
+                    __node *temp = __max(node->__left);
+                    node->__data = temp->__data;
+                    __remove(temp->__data, node->__left);
+                }
+            } else {
+                if (node->__left && node->__right) {
+                    __node *temp = __max(node->__left);
+                    node->__data = temp->__data;
+                    __remove(temp->__data, node->__left);
+                } else if (node->__left && node->__left->__color == red) {
+                    __node *temp = node->__left;
+                    temp->__color = black;
+                    temp->__parent = node->__parent;
+                    delete node;
+                    node = temp;
+                } else if (node->__right && node->__right->__color == red) {
+                    __node *temp = node->__right;
+                    temp->__color = black;
+                    temp->__parent = node->__parent;
+                    delete node;
+                    node = temp;
+                } else {
+                    // TODO рассмотреть случай если удаляемая вершина является корнем
+                    __node *parent = node->__parent;
+                    delete node;
+                    node = nullptr;
+                    __remove_fix_up(parent);
+                }
+            }
+        }
+    }
 
+/*
     void __remove(const T &value, __node *&node) noexcept {
         if (!node)
             return;
@@ -202,41 +283,9 @@ private:
             }
         }
     }
+    */
 
-
-/*void __remove(const T &value, __node *&node) noexcept {
-    if (!node)
-        return;
-    else if (value > node->__data) {
-        __remove(value, node->__right);
-    } else if (value < node->__data) {
-        __remove(value, node->__left);
-    } else {
-        if (!(node->__left) && !(node->__right))
-            delete node;
-        else if (!(node->__left)) {
-            __node *new_node = node->__right;
-            new_node->__parent = node->__parent;
-            delete node;
-            node = new_node;
-        } else if (!(node->__right)) {
-            __node *new_node = node->__left;
-            new_node->__parent = node->__parent;
-            delete node;
-            node = new_node;
-        } else {
-            __node *new_node = __min(node->__right);
-            node->__data = new_node->__data;
-            __remove(new_node->__data, node->__right);
-        }
-    }
-}*/
-
-    __node
-
-    *
-    __min(__node
-          *node) const noexcept {
+    __node *__min(__node *node) const noexcept {
         while (node->__left)
             node = node->__left;
         return

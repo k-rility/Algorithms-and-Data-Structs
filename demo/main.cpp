@@ -10,6 +10,8 @@ int main() {
     rbt.insert(35);
     rbt.insert(37);
     rbt.insert(32);
+
+    rbt.remove(32);
     rbt.remove(50);
 //    std::cout << rbt.bh() << std::endl;
     return 0;
