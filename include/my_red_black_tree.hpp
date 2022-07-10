@@ -175,11 +175,24 @@ private:
         } else {
             if (!(node->__right)) {
                 if (node->__left->__color == red) {
-                    if (node->__left->__left == __min(node->__left) &&
-                        node->__left->__right == __max(node->__left)) {
+                    if (node->__left->__right == __max(node->__left)) {
                         node->__left->__color = black;
                         node->__left->__right->__color = red;
                         __node *temp = node;
+                        __right_rotate(temp);
+                    } else if (node->__left->__right->__left) {
+                        __node *left = node->__left;
+                        left->__right->__left->__color = black;
+                        __node *temp = node;
+                        __left_rotate(left);
+                        __right_rotate(temp);
+                    } else {
+                        __node *left_correct = node->__left->__right;
+                        node->__left->__right->__right->__color = black;
+                        __node *temp = node;
+                        __left_rotate(left_correct);
+                        __node *left = node->__left;
+                        __left_rotate(left);
                         __right_rotate(temp);
                     }
                 }
@@ -231,74 +244,6 @@ private:
             }
         }
     }
-
-/*
-    void __remove(const T &value, __node *&node) noexcept {
-        if (!node)
-            return;
-        else if (value > node->__data)
-            __remove(value, node->__right);
-        else if (value < node->__data)
-            __remove(value, node->__left);
-        else {
-            if (node->__color == red) {
-                if (!(node->__left) && !(node->__right))
-                    delete node;
-                else if (node->__left && node->__right) {
-                    __node *new_node = __max(node->__left);
-                    node->__data = new_node->__data;
-                    new_node->__parent->__right = nullptr;
-                    __remove(new_node->__data, node->__left);
-                }
-            } else {
-                if (node->__left && node->__left->__color == red) {
-                    __node *new_node = node->__left;
-                    new_node->__parent = node->__parent;
-                    new_node->__color = black;
-                    delete node;
-                    node = new_node;
-                } else if (node->__right && node->__right->__color == red) {
-                    __node *new_node = node->__right;
-                    new_node->__parent = node->__parent;
-                    new_node->__color = black;
-                    delete node;
-                    node = new_node;
-                } else if (!(node->__right) && !(node->__left)) {
-                    __node *temp = node->__parent;
-                    temp->__color = black;
-                    if (node == node->__parent->__left) {
-                        if (node->__parent->__right) {
-                            node->__parent->__right->__color = red;
-                            if (node->__parent->__right->__right)
-                                node->__parent->__right->__right->__color = black;
-                        }
-                        delete node;
-                        temp->__left = nullptr;
-                        __left_rotate(temp);
-                    } else {
-                        if (node->__parent->__left) {
-                            node->__parent->__left->__color = red;
-                            if (node->__parent->__left->__left)
-                                node->__parent->__left->__left->__color = black;
-                        }
-                        delete node;
-                        temp->__right = nullptr;
-                        __right_rotate(temp);
-                    }
-                }
-//                __node *new_node;
-//                if (node->__left && node->__left->__color == red)
-//                    new_node = node->__left;
-//                else if (node->__right && node->__right->__color == red)
-//                    new_node = node->__right;
-//                new_node->__parent = node->__parent;
-//                new_node->__color = black;
-//                delete node;
-//                node = new_node;
-            }
-        }
-    }
-    */
 
     __node *__min(__node *node) const noexcept {
         while (node->__left)

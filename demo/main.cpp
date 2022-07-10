@@ -13,10 +13,16 @@ int main() {
     rbt.insert(50);
     rbt.insert(10);
     rbt.insert(5);
+    rbt.insert(15);
+
+    rbt.remove(15);
+
     rbt.insert(25);
 
-    rbt.remove(25);
     rbt.remove(50);
+
+//    rbt.remove(25);
+//    rbt.remove(50);
 
 
 //    rbt.remove(32);
