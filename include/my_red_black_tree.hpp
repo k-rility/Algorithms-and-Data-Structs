@@ -59,7 +59,7 @@ private:
             return;
         __node *parent = node->__parent;
         __node *gparent = parent->__parent;
-        if (!(gparent->__right) || (!(gparent->__right->__left) && !(gparent->__right->__right))) {
+        if (parent == gparent->__left) {
             __node *uncle = gparent->__right;
             if (uncle && uncle->__color == red) {
                 parent->__color = black;
@@ -75,7 +75,7 @@ private:
                     parent->__color = black;
                 }
             }
-        } else if (!(gparent->__left) || (!(gparent->__left->__left) && !(gparent->__left->__right))) {
+        } else {
             __node *uncle = gparent->__left;
             if (uncle && uncle->__color == red) {
                 parent->__color = black;
@@ -102,7 +102,6 @@ private:
             pivot->__right->__parent = node;
         }
         pivot->__parent = node->__parent;
-        __node *temp = node;
         if (node->__parent == nullptr) {
             __root = pivot;
         } else if (node == node->__parent->__left) {
@@ -110,8 +109,8 @@ private:
         } else if (node == node->__parent->__right) {
             node->__parent->__right = pivot;
         }
-        pivot->__right = temp;
-        temp->__parent = pivot;
+        pivot->__right = node;
+        node->__parent = pivot;
     }
 
     void __left_rotate(__node *&node) noexcept {
@@ -121,10 +120,10 @@ private:
             pivot->__left->__parent = node;
         }
         pivot->__parent = node->__parent;
-        __node *temp = node;
         if (node->__parent == nullptr) {
             __root = pivot;
-            //TODO тут можно сделать по другому без else if, аналогично и с правым вращением
+            //TODO тут можно сделать по другому без else if, аналогично и с правым вращением (но как я понял лучше,
+            // покачто, оставить как есть)
         } else if (node == node->__parent->__left) {
             //node=pivot
             node->__parent->__left = pivot;
@@ -132,8 +131,8 @@ private:
             //node=pivot
             node->__parent->__right = pivot;
         }
-        pivot->__left = temp;
-        temp->__parent = pivot;
+        pivot->__left = node;
+        node->__parent = pivot;
     }
 
     void __remove_fix_up(__node *&node) noexcept {
@@ -143,14 +142,16 @@ private:
                     node->__color = black;
                     node->__left->__color = red;
                 } else if (node->__left->__left) {
+                    __node *temp = node;
                     node->__color = black;
                     node->__left->__color = red;
                     node->__left->__left->__color = black;
-                    __right_rotate(node);
+                    __right_rotate(temp);
                 } else {
+                    __node *left = node->__left;
                     node->__left->__color = red;
                     node->__left->__right->__color = black;
-                    __left_rotate(node->__left);
+                    __left_rotate(left);
                     __remove_fix_up(node);
                 }
             } else {
@@ -158,15 +159,29 @@ private:
                     node->__color = black;
                     node->__right->__color = red;
                 } else if (node->__right->__right) {
+                    __node *temp = node;
                     node->__color = black;
                     node->__right->__color = red;
                     node->__right->__right->__color = black;
-                    __left_rotate(node);
+                    __left_rotate(temp);
                 } else {
+                    __node *right = node->__right;
                     node->__right->__color = red;
                     node->__right->__left->__color = black;
-                    __right_rotate(node->__right);
+                    __right_rotate(right);
                     __remove_fix_up(node);
+                }
+            }
+        } else {
+            if (!(node->__right)) {
+                if (node->__left->__color == red) {
+                    if (node->__left->__left == __min(node->__left) &&
+                        node->__left->__right == __max(node->__left)) {
+                        node->__left->__color = black;
+                        node->__left->__right->__color = red;
+                        __node *temp = node;
+                        __right_rotate(temp);
+                    }
                 }
             }
         }
