@@ -44,13 +44,12 @@ private:
     }
 
     __node *__find(const T &value, __node *node) const noexcept {
-        if (node == nullptr) {
+        if (node == nullptr)
             return nullptr;
-        } else if (value > node->__data) {
+        else if (value > node->__data)
             return __find(value, node->__right);
-        } else if (value < node->__data) {
+        else if (value < node->__data)
             return __find(value, node->__left);
-        }
         return node;
     }
 
@@ -61,7 +60,7 @@ private:
         __node *gparent = parent->__parent;
         if (parent == gparent->__left) {
             __node *uncle = gparent->__right;
-            if (uncle && uncle->__color == red) {
+            if (uncle && uncle->__color == red && parent->__color == red) {
                 parent->__color = black;
                 uncle->__color = black;
                 gparent->__color = red;
@@ -69,6 +68,9 @@ private:
             } else if (parent->__color == red) {
                 if (parent->__right == node) {
                     __left_rotate(parent);
+                    __right_rotate(gparent);
+                    gparent->__color = red;
+                    parent->__parent->__color = black;
                 } else {
                     __right_rotate(gparent);
                     gparent->__color = red;
@@ -77,18 +79,21 @@ private:
             }
         } else {
             __node *uncle = gparent->__left;
-            if (uncle && uncle->__color == red) {
+            if (uncle && uncle->__color == red && parent->__color == red) {
                 parent->__color = black;
                 uncle->__color = black;
                 gparent->__color = red;
                 __insert_fix_up(gparent);
             } else if (parent->__color == red) {
-                if (parent->__right == node) {
+                if (parent->__left == node) {
+                    __right_rotate(parent);
+                    __left_rotate(gparent);
+                    gparent->__color = red;
+                    parent->__parent->__color = black;
+                } else {
                     __left_rotate(gparent);
                     gparent->__color = red;
                     parent->__color = black;
-                } else {
-                    __right_rotate(parent);
                 }
             }
         }
@@ -136,9 +141,159 @@ private:
     }
 
     void __remove_fix_up(__node *&node) noexcept {
+        if (!node) return;
+        if (node->__color == red) {
+            if (!node->__right) {
+                if ((!node->__left->__left && !node->__left->__right) ||
+                    (node->__left->__left->__color == black && node->__left->__right->__color == black)) {
+                    node->__color = black;
+                    node->__left->__color = red;
+                } else if (node->__left->__left && node->__left->__left->__color == red) {
+                    __node *temp = node;
+                    node->__color = black;
+                    node->__left->__color = red;
+                    node->__left->__left->__color = black;
+                    __right_rotate(temp);
+                } else {
+                    __node *left = node->__left;
+                    node->__left->__color = red;
+                    node->__left->__right->__color = black;
+                    __left_rotate(left);
+                    __remove_fix_up(node);
+                }
+            } else {
+                if ((!(node->__right->__left) && !(node->__right->__right)) ||
+                    (node->__right->__left->__color == black && node->__right->__right->__color == black)) {
+                    node->__color = black;
+                    node->__right->__color = red;
+                } else if (node->__right->__right && node->__right->__right->__color == red) {
+                    __node *temp = node;
+                    node->__color = black;
+                    node->__right->__color = red;
+                    node->__right->__right->__color = black;
+                    __left_rotate(temp);
+                } else {
+                    __node *right = node->__right;
+                    node->__right->__color = red;
+                    node->__right->__left->__color = black;
+                    __right_rotate(right);
+                    __remove_fix_up(node);
+                }
+            }
+        } else {
+            if (!node->__right) {
+                if (node->__left->__color == red) {
+                    if (node->__left->__right == __max(node->__left)) {
+                        node->__left->__color = black;
+                        node->__left->__right->__color = red;
+                        __node *temp = node;
+                        __right_rotate(temp);
+                    } else if (node->__left->__right->__left) {
+                        node->__left->__right->__left->__color = black;
+                        __node *left = node->__left;
+                        __left_rotate(left);
+                        __node *temp = node;
+                        __right_rotate(temp);
+                    } else {
+                        __node *left_correct = node->__left->__right;
+                        node->__left->__right->__right->__color = black;
+                        __node *temp = node;
+                        __left_rotate(left_correct);
+                        __node *left = node->__left;
+                        __left_rotate(left);
+                        __right_rotate(temp);
+                    }
+                } else {
+                    if (node->__left->__right) {
+                        node->__left->__right->__color = black;
+                        __node *left = node->__left;
+                        __left_rotate(left);
+                        __node *temp = node;
+                        __right_rotate(temp);
+                    } else if (!node->__left->__right && node->__left->__left) {
+                        __node *left_correct = node->__left;
+                        node->__left->__color = red;
+                        node->__left->__left->__color = black;
+                        __right_rotate(left_correct);
+                        __node *left = node->__left;
+                        __left_rotate(left);
+                        __node *temp = node;
+                        __right_rotate(temp);
+                    } else {
+                        node->__left->__color = red;
+                        if (node == node->__parent->__left) {
+                            node->__parent->__left = nullptr;
+                            __remove_fix_up(node->__parent);
+                            node->__parent->__left = node;
+                        } else {
+                            node->__parent->__right = nullptr;
+                            __remove_fix_up(node->__parent);
+                            node->__parent->__right = node;
+                        }
+                    }
+                }
+            } else {
+                if (node->__right->__color == red) {
+                    if (node->__right->__left == __max(node->__right)) {
+                        node->__right->__color = black;
+                        node->__right->__left->__color = red;
+                        __node *temp = node;
+                        __left_rotate(temp);
+                    } else if (node->__right->__left->__right) {
+                        node->__right->__left->__right->__color = black;
+                        __node *right = node->__right;
+                        __right_rotate(right);
+                        __node *temp = node;
+                        __left_rotate(temp);
+                    } else {
+                        __node *right_correct = node->__right->__left;
+                        node->__right->__left->__left->__color = black;
+                        __node *temp = node;
+                        __right_rotate(right_correct);
+                        __node *right = node->__right;
+                        __right_rotate(right);
+                        __left_rotate(temp);
+                    }
+                } else {
+                    if (node->__right->__left) {
+                        node->__right->__left->__color = black;
+                        __node *right = node->__right;
+                        __right_rotate(right);
+                        __node *temp = node;
+                        __left_rotate(temp);
+                    } else if (!node->__right->__left && node->__right->__right) {
+                        __node *right_correct = node->__right;
+                        node->__right->__color = red;
+                        node->__right->__right->__color = black;
+                        __left_rotate(right_correct);
+                        __node *right = node->__right;
+                        __right_rotate(right);
+                        __node *temp = node;
+                        __left_rotate(temp);
+                    } else {
+                        node->__right->__color = red;
+                        if (node == node->__parent->__left) {
+                            node->__parent->__left = nullptr;
+                            __remove_fix_up(node->__parent);
+                            node->__parent->__left = node;
+                        } else {
+                            node->__parent->__right = nullptr;
+                            __remove_fix_up(node->__parent);
+                            node->__parent->__right = node;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+/*
+    void __remove_fix_up(__node *&node) noexcept {
+        if (!node) return;
         if (node->__color == red) {
             if (!(node->__right)) {
-                if (!(node->__left->__left) && !(node->__left->__right)) {
+                if ((!(node->__left->__left) && !(node->__left->__right)) ||
+                    (node->__left->__left->__color == black && node->__left->__right->__color == black)) {
                     node->__color = black;
                     node->__left->__color = red;
                 } else if (node->__left->__left) {
@@ -155,7 +310,8 @@ private:
                     __remove_fix_up(node);
                 }
             } else {
-                if (!(node->__right->__left) && !(node->__right->__right)) {
+                if ((!(node->__right->__left) && !(node->__right->__right)) ||
+                    (node->__right->__left->__color == black && node->__right->__right->__color == black)) {
                     node->__color = black;
                     node->__right->__color = red;
                 } else if (node->__right->__right) {
@@ -186,7 +342,7 @@ private:
                         __node *temp = node;
                         __left_rotate(left);
                         __right_rotate(temp);
-                    } else {
+                    } else if (!node->__left->__right->__left) {
                         __node *left_correct = node->__left->__right;
                         node->__left->__right->__right->__color = black;
                         __node *temp = node;
@@ -195,10 +351,105 @@ private:
                         __left_rotate(left);
                         __right_rotate(temp);
                     }
+                } else {
+                    if (node->__left->__right) {
+                        __node *left = node->__left;
+                        node->__left->__right->__color = black;
+                        __left_rotate(left);
+                        __node *temp = node;
+                        __right_rotate(temp);
+                    } else if (!node->__left->__right && node->__left->__left) {
+                        __node *left_correct = node->__left;
+                        node->__left->__left->__color = black;
+                        __right_rotate(left_correct);
+                        __node *temp = node;
+                        // TODO тут что-то не так мб
+                        __node *left = node->__left;
+                        __left_rotate(left);
+                        __right_rotate(temp);
+                    } else {
+                        node->__left->__color = red;
+                        if (node == node->__parent->__left) {
+                            node->__parent->__left = nullptr;
+                            __remove_fix_up(node->__parent);
+                            node->__parent->__left = node;
+                        } else {
+                            node->__parent->__right = nullptr;
+                            __remove_fix_up(node->__parent);
+                            node->__parent->__right = node;
+                        }
+//                        if (node->__parent == __root && node == node->__parent->__right) {
+//                            __node *parent = node->__parent;
+//                            parent->__left->__left->__color = black;
+//                            __right_rotate(parent);
+//                            return;
+//                        }
+//                        __remove_fix_up(node->__parent);
+                    }
+                }
+            } else {
+                if (node->__right->__color == red) {
+                    if (node->__right->__right == __max(node->__left)) {
+                        node->__left->__color = black;
+                        node->__left->__right->__color = red;
+                        __node *temp = node;
+                        __left_rotate(temp);
+                    } else if (node->__left->__right->__left) {
+                        __node *left = node->__left;
+                        left->__right->__left->__color = black;
+                        __node *temp = node;
+                        __right_rotate(left);
+                        __left_rotate(temp);
+                    } else if (!node->__left->__right->__left) {
+                        __node *left_correct = node->__left->__right;
+                        node->__left->__right->__right->__color = black;
+                        __node *temp = node;
+                        __right_rotate(left_correct);
+                        __node *left = node->__left;
+                        __right_rotate(left);
+                        __left_rotate(temp);
+                    }
+                } else {
+                    if (node->__left->__right) {
+                        __node *left = node->__left;
+                        node->__left->__right->__color = black;
+                        __right_rotate(left);
+                        __node *temp = node;
+                        __left_rotate(temp);
+                    } else if (!node->__left->__right && node->__left->__left) {
+                        __node *left_correct = node->__left;
+                        node->__left->__left->__color = black;
+                        __left_rotate(left_correct);
+                        __node *temp = node;
+                        // TODO тут что-то не так мб
+                        __node *left = node->__left;
+                        __right_rotate(left);
+                        __left_rotate(temp);
+                    } else {
+                        node->__left->__color = red;
+                        if (node == node->__parent->__left) {
+                            node->__parent->__left = nullptr;
+                            __remove_fix_up(node->__parent);
+                            node->__parent->__left = node;
+                        } else {
+                            node->__parent->__right = nullptr;
+                            __remove_fix_up(node->__parent);
+                            node->__parent->__right = node;
+                        }
+//                        if (node->__parent == __root && node == node->__parent->__left) {
+//                            __node *parent = node->__parent;
+//                            parent->__right->__right->__color = black;
+//                            __left_rotate(parent);
+//                            return;
+//                        }
+                        __remove_fix_up(node->__parent);
+                    }
                 }
             }
         }
     }
+
+    */
 
     void __remove(const T &value, __node *&node) noexcept {
         if (!node)
@@ -260,6 +511,14 @@ private:
                 node;
     }
 
+    void __print(__node *node) const noexcept {
+        if (node) {
+            __print(node->__left);
+            std::cout << node->__data << " ";
+            __print(node->__right);
+        }
+    }
+
 public:
 
     my_red_black_tree()
@@ -297,6 +556,10 @@ public:
         if (__root == nullptr)
             return true;
         return false;
+    }
+
+    void print() const noexcept {
+        __print(__root);
     }
 
 private:
