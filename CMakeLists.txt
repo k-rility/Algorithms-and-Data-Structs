@@ -50,6 +50,7 @@ if (BUILD_TESTS)
             ${CMAKE_CURRENT_SOURCE_DIR}
             tests/my_stack_test.cpp
             tests/red_black_tree_test.cpp
+            tests/avl_tree_test.cpp
             )
 
     target_link_libraries(tests ${PROJECT_NAME} GTest::gtest_main)

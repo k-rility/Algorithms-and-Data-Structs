@@ -43,7 +43,7 @@ private:
         return node;
     }
 
-    void    __remove(const T &value, __node *&node) noexcept {
+    void __remove(const T &value, __node *&node) noexcept {
         if (node == nullptr) {
             return;
         } else if (value > node->__data) {

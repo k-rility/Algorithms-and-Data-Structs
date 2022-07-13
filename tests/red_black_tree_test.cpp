@@ -14,6 +14,6 @@ TEST(Red_Black_Tree, Destructor) {}
 
 TEST(Red_Black_Tree, Find) {}
 
-TEST(Red_Black_Tree, LeftRotate) {}
+TEST(Red_Black_Tree, Insert) {}
 
-TEST(Red_Black_Tree, RightRotate) {}
+TEST(Red_Black_Tree, Remove) {}
