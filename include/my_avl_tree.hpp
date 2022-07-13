@@ -40,21 +40,21 @@ private:
             node->__height = height_right + 1;
     }
 
-    __node *__insert_fix_up(__node *node) noexcept {
+    __node *__balance(__node *node) noexcept {
         __fix_height(node);
-        if (__balance(node) == 2) {
-            if (__balance(node->__right) < 0)
+        if (__check_balance(node) == 2) {
+            if (__check_balance(node->__right) < 0)
                 node->__right = __right_rotate(node->__right);
             return __left_rotate(node);
-        } else if (__balance(node) == -2) {
-            if (__balance(node->__left) > 0)
+        } else if (__check_balance(node) == -2) {
+            if (__check_balance(node->__left) > 0)
                 node->__left = __left_rotate(node->__left);
             return __right_rotate(node);
         }
         return node;
     }
 
-    unsigned char __balance(__node *node) const noexcept {
+    unsigned char __check_balance(__node *node) const noexcept {
         return height(node->__right) - height(node->__left);
     }
 
@@ -86,9 +86,57 @@ private:
         return right;
     }
 
+    __node *__min(__node *node) const noexcept {
+        if (!node || !node->__left)
+            return node;
+        return __min(node->__left);
+    }
+
+    __node *__max(__node *node) const noexcept {
+        if (!node || !node->__right)
+            return node;
+        return __max(node->__right);
+    }
+
+    __node *__remove(const T &value, __node *node) noexcept {
+        if (!node) return nullptr;
+        else if (value > node->__data)
+            node->__right = __remove(value, node->__right);
+        else if (value < node->__data)
+            node->__left = __remove(value, node->__left);
+        else {
+            if (!node->__left && !node->__right) {
+                delete node;
+                return nullptr;
+            } else if (!node->__right) {
+                __node *new_left = node->__left;
+                delete node;
+                return new_left;
+            } else if (!node->__left) {
+                __node *new_right = node->__right;
+                delete node;
+                return new_right;
+            } else {
+                __node *min = __min(node->__right);
+                node->__data = min->__data;
+                node->__right = __remove(min->__data, node->__right);
+                return node;
+            }
+        }
+        return __balance(node);
+    }
+
 public:
 
     my_avl_tree() noexcept: __root(nullptr) {}
+
+    __node *min() const noexcept {
+        return __min(__root);
+    }
+
+    __node *max() const noexcept {
+        return __max(__root);
+    }
 
     ~my_avl_tree() noexcept {
         __destructor(__root);
@@ -106,6 +154,10 @@ public:
 
     void insert(const T &value) noexcept {
         __root = __insert(value, __root);
+    }
+
+    void remove(const T &value) noexcept {
+        __root = __remove(value, __root);
     }
 
 private:
