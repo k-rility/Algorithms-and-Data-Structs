@@ -23,35 +23,37 @@ private:
     }
 
     void __zig(__node *node) noexcept {
-        __node *pivot = node->__left;
-        node->__left = pivot->__right;
-        if (pivot->__right)
-            pivot->__right->__parent = pivot->__parent;
-        pivot->__parent = node->__parent;
-        if (!node->__parent)
-            __root = pivot;
-        else if (node == node->__parent->__left)
-            node->__parent->__left = pivot;
+        if (node == __root) return;
+        __node *pivot = node->__parent;
+        pivot->__left = node->__right;
+        if (node->__right)
+            node->__right->__parent = pivot;
+        node->__parent = pivot->__parent;
+        if (!pivot->__parent)
+            __root = node;
+        else if (pivot == pivot->__parent->__left)
+            pivot->__parent->__left = node;
         else
-            node->__parent->__right = pivot;
-        pivot->__right = node;
-        node->__parent = pivot;
+            pivot->__parent->__right = node;
+        node->__right = pivot;
+        pivot->__parent = node;
     }
 
     void __zag(__node *node) noexcept {
-        __node *pivot = node->__right;
-        node->__right = pivot->__left;
-        if (pivot->__left)
-            pivot->__left->__parent = pivot->__parent;
-        pivot->__parent = node->__parent;
-        if (!node->__parent)
-            __root = pivot;
-        else if (node == node->__parent->__left)
-            node->__parent->__left = pivot;
+        if (node == __root) return;
+        __node *pivot = node->__parent;
+        pivot->__right = node->__left;
+        if (node->__left)
+            node->__left->__parent = pivot;
+        node->__parent = pivot->__parent;
+        if (!pivot->__parent)
+            __root = node;
+        else if (pivot == pivot->__parent->__left)
+            pivot->__parent->__left = node;
         else
-            node->__parent->__right = pivot;
-        pivot->__left = node;
-        node->__parent = pivot;
+            pivot->__parent->__right = node;
+        node->__left = pivot;
+        pivot->__parent = node;
     }
 
     void __insert(const T &value, __node *&parent, __node *&node) noexcept {
@@ -78,10 +80,22 @@ private:
     void __splay(__node *&node) noexcept {
         while (node != __root) {
             if (node->__parent == __root && node == node->__parent->__left)
-                __zig(node->__parent);
+                __zig(node);
             else if (node->__parent == __root && node == node->__parent->__right)
+                __zag(node);
+            else if (node == node->__parent->__left && node->__parent == node->__parent->__parent->__left) {
+                __zig(node->__parent);
+                __zig(node);
+            } else if (node == node->__parent->__right && node->__parent == node->__parent->__parent->__right) {
                 __zag(node->__parent);
-            else if()
+                __zag(node);
+            } else if (node->__parent == node->__parent->__parent->__left && node == node->__parent->__right) {
+                __zag(node);
+                __zig(node);
+            } else if (node->__parent == node->__parent->__parent->__right && node == node->__parent->__left) {
+                __zig(node);
+                __zag(node);
+            }
         }
     }
 
