@@ -10,7 +10,8 @@ TEST(Red_Black_Tree, Constructor) {
     ASSERT_FALSE(rbt.empty());
 }
 
-TEST(Red_Black_Tree, Destructor) {}
+TEST(Red_Black_Tree, Destructor) {
+}
 
 TEST(Red_Black_Tree, Find) {}
 

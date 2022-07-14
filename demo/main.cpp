@@ -1,13 +1,30 @@
 #include <iostream>
 #include "my_red_black_tree.hpp"
+#include <string>
+
+void func(int *&tt) {
+    std::cout << &tt << std::endl;
+    int b = 20;
+    int *other = &b;
+    tt = other;
+    std::cout << &tt << std::endl;
+//    std::cout << *tt << std::endl;
+}
 
 int main() {
-    my_red_black_tree<int> rbt;
+    int a = 10;
+    int *ptr = &a;
+    std::cout << &ptr << std::endl;
+    func(ptr);
+    std::cout << *ptr << std::endl;
 
-    rbt.insert(100);
-    rbt.insert(50);
-    rbt.insert(120);
-    rbt.remove(100);
+//    my_red_black_tree<int> rbt;
+
+//    rbt.insert(100);
+//    rbt.insert(50);
+//    rbt.insert(120);
+//    rbt.remove(100);
+
 //    rbt.insert(80);
 //    rbt.insert(60);
 //    rbt.insert(40);

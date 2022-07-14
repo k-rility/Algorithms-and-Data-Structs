@@ -65,7 +65,7 @@ private:
             node->__right = __insert(value, node->__right);
         else if (value < node->__data)
             node->__left = __insert(value, node->__left);
-        return __insert_fix_up(node);
+        return __balance(node);
     }
 
     __node *__left_rotate(__node *node) noexcept {
