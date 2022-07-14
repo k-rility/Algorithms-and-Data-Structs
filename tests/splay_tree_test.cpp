@@ -9,4 +9,5 @@ TEST(Splay_Tree, Constructor) {
     spt.insert(12);
     spt.insert(19);
     spt.insert(8);
+    spt.find(31);
 }

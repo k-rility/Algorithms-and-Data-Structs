@@ -13,13 +13,13 @@ private:
 
 private:
 
-    __node *__find(const T &value, __node *node) const noexcept {
+    __node *__find(const T &value, __node *node) noexcept {
         if (!node) return nullptr;
         else if (value > node->__data)
             return __find(value, node->__right);
         else if (value < node->__data)
             return __find(value, node->__left);
-        return node;
+        return __splay(node);
     }
 
     void __zig(__node *node) noexcept {
@@ -77,7 +77,7 @@ private:
         }
     }
 
-    void __splay(__node *&node) noexcept {
+    __node *__splay(__node *&node) noexcept {
         while (node != __root) {
             if (node->__parent == __root && node == node->__parent->__left)
                 __zig(node);
@@ -97,6 +97,7 @@ private:
                 __zag(node);
             }
         }
+        return node;
     }
 
 public:
@@ -107,7 +108,7 @@ public:
         __destructor(__root);
     }
 
-    __node *find(const T &value) const noexcept {
+    __node *find(const T &value) noexcept {
         return __find(value, __root);
     }
 
