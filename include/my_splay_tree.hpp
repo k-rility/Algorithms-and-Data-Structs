@@ -100,6 +100,38 @@ private:
         return node;
     }
 
+    __node *__max(__node *node) const noexcept {
+        while (node->__right)
+            node = node->__right;
+        return node;
+    }
+
+    __node *__min(__node *node) const noexcept {
+        while (node->__left)
+            node = node->__left;
+        return node;
+    }
+
+    void __remove(const T &value, __node *node) noexcept {
+        if (!node) return;
+        else if (value > node->__data)
+            __remove(value, node->__right);
+        else if (value < node->__data)
+            __remove(value, node->__left);
+        else {
+            __splay(node);
+            __node *new_root = nullptr;
+            if (node->__left) {
+                new_root = __min(node);
+                new_root->__right = node->__right;
+            } else
+                new_root = node->__right;
+            delete __root;
+            __root = new_root;
+            __root->__parent = nullptr;
+        }
+    }
+
 public:
 
     my_splay_tree() noexcept: __root(nullptr) {}
@@ -115,6 +147,18 @@ public:
     void insert(const T &value) noexcept {
         __node *node = new __node{nullptr, nullptr, nullptr, value};
         __insert(value, __root, node);
+    }
+
+    __node *max() const noexcept {
+        return __max(__root);
+    }
+
+    __node *min() const noexcept {
+        return __min(__root);
+    }
+
+    void remove(const T &value) noexcept {
+        __remove(value, __root);
     }
 
 private:
