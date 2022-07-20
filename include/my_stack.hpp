@@ -3,7 +3,7 @@
 #define ALGORITHS_AND_DATA_STRUCTS_STACK_HPP
 
 #include <iostream>
-#include <iterator>
+#include <memory>
 
 template<class T>
 
@@ -63,6 +63,32 @@ public:
 private:
     __node *__top;
     size_t __size = 0;
+};
+
+/////////////////////////////////////////////////////////////////////////////////
+
+template<typename T>
+class Stack {
+private:
+    struct _Node {
+        T _Data;
+        std::unique_ptr<_Node> _Next;
+    };
+public:
+    Stack() noexcept: _Top(nullptr) {}
+
+    ~Stack() noexcept {}
+
+    void Push(const T &value) noexcept {
+        _Top = std::make_unique<_Node>(_Node{value, std::move(_Top)});
+    }
+
+    void Pop() noexcept {
+        _Top = std::move(_Top->_Next);
+    }
+
+private:
+    std::unique_ptr<_Node> _Top;
 };
 
 #endif //ALGORITHS_AND_DATA_STRUCTS_STACK_HPP

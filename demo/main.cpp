@@ -1,22 +1,29 @@
 #include <iostream>
 #include "my_red_black_tree.hpp"
 #include <string>
+#include <array>
+#include <vector>
+#include <algorithm>
+#include <list>
 
-void func(int *&tt) {
-    std::cout << &tt << std::endl;
-    int b = 20;
-    int *other = &b;
-    tt = other;
-    std::cout << &tt << std::endl;
-//    std::cout << *tt << std::endl;
-}
+#include <memory>
 
 int main() {
-    int a = 10;
-    int *ptr = &a;
-    std::cout << &ptr << std::endl;
-    func(ptr);
-    std::cout << *ptr << std::endl;
+
+
+//    int a[2] = {1, 2};
+//    auto b = std::move(a);
+//    std::cout << a << std::endl;
+//    [[maybe_unused]] std::array<int, 0> arr;
+//    int a[4] = {5, 2, 3, 4};
+//    for (size_t i = 0; i < 4; ++i)
+//    std::cout << arr[0] << std::endl;
+
+//    vec2.push_back(std::remove_if(vec1.begin(), vec1.end(), [](const int &a, const int &b) {
+//        return a;
+//    }));
+
+//    for(size_t i=0;i<num.)
 
 //    my_red_black_tree<int> rbt;
 

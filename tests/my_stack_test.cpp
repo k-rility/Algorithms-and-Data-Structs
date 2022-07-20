@@ -2,9 +2,9 @@
 #include "my_stack.hpp"
 
 TEST(Stack, Constructors) {
-    my_stack<int> st;
-
-    st.push(10);
-
-
+    Stack<int> st;
+    st.Push(10);
+    st.Push(20);
+    st.Push(30);
+    st.Pop();
 }

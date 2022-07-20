@@ -52,6 +52,8 @@ if (BUILD_TESTS)
             tests/red_black_tree_test.cpp
             tests/avl_tree_test.cpp
             tests/splay_tree_test.cpp
+            tests/two_three_tree_test.cpp
+            tests/b_tree_test.cpp
             )
 
     target_link_libraries(tests ${PROJECT_NAME} GTest::gtest_main)
