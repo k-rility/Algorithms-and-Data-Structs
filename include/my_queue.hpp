@@ -2,6 +2,7 @@
 #define ALGORITHS_AND_DATA_STRUCTS_MY_QUEUE_HPP
 
 #include <iostream>
+#include <memory>
 
 template<class T>
 class my_queue {
@@ -62,6 +63,40 @@ private:
     node *__head;
     node *__tail;
     size_t __size = 0;
+};
+
+template<class T>
+class Queue {
+public:
+
+    Queue() : _head{nullptr}, _tail{nullptr} {}
+
+    void enqueue(const T &val) {
+        std::shared_ptr<node> new_node = std::make_shared<node>(node{nullptr, val});
+        if (!_head) {
+            _head = new_node;
+            _tail = _head;
+            return;
+        }
+        _tail->_next = new_node;
+        _tail = new_node;
+    }
+
+    T dequeue() {
+        if (!_head)
+            throw std::runtime_error("error");
+        T temp = _head->_data;
+        _head = _head->_next;
+        return temp;
+    }
+
+private:
+    struct node {
+        std::shared_ptr<node> _next;
+        T _data;
+    };
+    std::shared_ptr<node> _head;
+    std::shared_ptr<node> _tail;
 };
 
 #endif //ALGORITHS_AND_DATA_STRUCTS_MY_QUEUE_HPP

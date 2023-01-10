@@ -73,14 +73,24 @@ private:
     struct _Node {
         T _Data;
         std::unique_ptr<_Node> _Next;
+
+        _Node(T val) : _Data{val}, _Next{nullptr} {}
+
+
+        ~_Node() {
+            std::cout << "Destructor" << std::endl;
+        }
     };
+
 public:
     Stack() noexcept: _Top(nullptr) {}
 
     ~Stack() noexcept {}
 
     void Push(const T &value) noexcept {
-        _Top = std::make_unique<_Node>(_Node{value, std::move(_Top)});
+        std::unique_ptr<_Node> new_node = std::make_unique<_Node>(value);
+        new_node->_Next = std::move(_Top);
+        _Top = std::move(new_node);
     }
 
     void Pop() noexcept {
